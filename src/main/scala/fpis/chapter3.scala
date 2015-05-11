@@ -4,14 +4,14 @@ object Chapter3 {
   /* 3.1 */
 
   /* 3.2 */
-  def tail[A](l: List[A]): List[A] = 
+  def tail[A](l: List[A]): List[A] =
     l match {
       case h :: t => t
       case _ => List()
     }
 
   /* 3.3 */
-  def setHead[A](l: List[A], x: A): List[A] = 
+  def setHead[A](l: List[A], x: A): List[A] =
     l match {
       case h :: t => x +: t
       case _ => List(x)
@@ -20,7 +20,7 @@ object Chapter3 {
   /* 3.4 */
   def drop[A](l: List[A], n: Int): List[A] = {
     @annotation.tailrec
-    def loop(as: List[A], i: Int): List[A] = 
+    def loop(as: List[A], i: Int): List[A] =
       (as, i) match {
         case (_, 0) => as
         case (h :: t, _) => loop(t, i - 1)
@@ -33,7 +33,7 @@ object Chapter3 {
   /* 3.5 */
   def dropWhile[A](l: List[A], f: A => Boolean): List[A] = {
     @annotation.tailrec
-    def loop(as: List[A]): List[A] = 
+    def loop(as: List[A]): List[A] =
       as match {
         case h :: t => if(f(h)) loop(t) else as
         case _ => List()
@@ -45,7 +45,7 @@ object Chapter3 {
   /* 3.6 */
   def init[A](l: List[A]): List[A] = {
     @annotation.tailrec
-    def loop(as: List[A], tail: List[A]): List[A] = 
+    def loop(as: List[A], tail: List[A]): List[A] =
       tail match {
         case h :: t => loop(as :+ h, t)
         case _ => as
@@ -58,7 +58,7 @@ object Chapter3 {
   /* 3.8 */
 
   /* 3.9 */
-  def length[A](as: List[A]): Int = 
+  def length[A](as: List[A]): Int =
     as.foldRight(0)((_,i) => i + 1)
 
   /* 3.10 */
@@ -89,9 +89,12 @@ object Chapter3 {
   def append[A](as: List[A], al: List[A]): List[A] =
     foldLeft(al, as)((z,a) => z :+ a)
 
+  def append2[A](as: List[A], al: List[A]): List[A] =
+    as.foldRight(al)((a,z) => a +: z) // O(1)
+
   /* 3.15 */
   def concatenate[A](as: List[List[A]]): List[A] =
-    foldLeft(as, List[A]())((z,a) => append(z,a))
+    as.foldRight(List[A]())((a,z) => append2(a, z))
 
   /* 3.16 */
   def translate(ns: List[Int], n: Int): List[Int] =
@@ -107,11 +110,11 @@ object Chapter3 {
 
   /* 3.19 */
   def filter[A](as: List[A])(f: A => Boolean): List[A] =
-    foldLeft(as, List[A]())((z,a) => if(f(a)) z :+ a else z)
+    as.foldRight(List[A]())((a,z) => if(f(a)) a +: z else z)
 
   /* 3.20 */
   def flatMap[A,B](as: List[A])(f: A => List[B]): List[B] =
-    foldLeft(as, List[B]())((z,a) => append(z, f(a)))
+    as.foldRight(List[B]())((a,z) => append2(f(a), z))
 
   /* 3.21 */
   def filter2[A](as: List[A])(f: A => Boolean): List[A] =
@@ -180,5 +183,4 @@ object Chapter3 {
   //     case l: Leaf[_] => Leaf(f(l.value))
   //     case b: Branch[_] => Branch(mapT2(b.left)(f), mapT2(b.right)(f))
   //   })
-
 }
