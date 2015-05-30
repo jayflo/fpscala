@@ -54,7 +54,7 @@ object Chapter4 {
     Some(a.foldRight(List[A]())((ao, z) => ao match {
       case None => z
       case s: Some[A] => s.get +: z
-      })).filter(al => al.length == a.length)
+    })).filter(al => al.length == a.length)
 
   /* 4.5 */
   def traverse[A,B](a: List[A])(f: A => Option[B]): Option[List[B]] =
@@ -65,7 +65,7 @@ object Chapter4 {
 
   def sequence2[A](a: List[Option[A]]): Option[List[A]] =
     traverse(a)(ao => ao)
-
+    
   /* 4.6 */
   // sealed trait Either[+E,+A] {
   //   def map[B](f: A => B): Either[E, B] =
