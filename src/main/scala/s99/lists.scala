@@ -28,7 +28,6 @@ object lists {
 
   def isPalindrome[A](la: List[A]): Boolean = la == reverse(la)
 
-
   def flatten[A](lla: List[List[A]]): List[A] =
     lla.foldRight(List[A]())((la, z) => la ::: z)
 
@@ -39,25 +38,56 @@ object lists {
     })
 
   def pack[A](la: List[A]): List[List[A]] =
-    la.foldRight(List[List[A]]())((a, z) => z.headOption match {
-      case Some(l) => { if(a == l.head) a :: l else List(a) :: z; z} // gah
-      case None => List(a) :: z
+    la.foldRight(List[List[A]]())((a, z) => z match {
+      case h :: t if a == h.head => a :: h; z // <-- I hate trailing z
+      case _ => List(a) :: z
     })
 
   def encode[A](la: List[A]): List[(Int, A)] =
     pack(la).map(l => (l.length, l.head)) // inefficient
 
+  def encodeModified[A](la: List[A]): List[Any] =
+    encode(la).map(t => if(t._1 == 1) t._2 else t)
+
   def decode[A](l: List[(Int, A)]): List[A] =
     l.flatMap(t => List.fill(t._1)(t._2))
 
-  //def encodeDirect[A](la: List[A]): List[(Int, A)] =*/
+  def encodeDirect[A](la: List[A]): List[(Int, A)] =
+    la.foldRight(List[(Int, A)]())((a, z) => z match {
+      case h :: t if a == h._2 => (h._1 + 1, a) :: t
+      case _ => (1, a) :: z
+    })
 
-  def duplicate[A](la: List[A]): List[A] =
-    la.flatMap(a => List(a,a))
+  def duplicate[A](n: Int, la: List[A]): List[A] =
+    la.flatMap(a => List.fill(n)(a))
 
-  // drops 0
-  def drop[A](n: Int, la: List[A]): List[A] =
-    la.view.zipWithIndex.filter(t => t._2 % n != 0).map(t => t._1).toList
+  def drop[A](n: Int, la: List[A]): List[A] = {
+      @annotation.tailrec
+      def loop(i: Int, res: List[A]): List[A] = i % n match {
+        case 0 => res
+        case _ => la(i) :: res
+      }
 
-  
+      if(la.length <= 1) la else loop(1, List(l.head))
+  }
+
+  def split[A](n: Int, la: List[A]): (List[A], List[A]) = {
+    val len = la.length - n
+
+    la.foldRight((List[A](),List[A]()))((a,z) => z._2.length match {
+      case n if n <= len => a :: z._2
+      case _ => a :: z._1
+    })
+  }
+
+  def slice[A](i: Int, k: Int, la: List[A]): List[A] =
+    split(k - i - 1, split(i - 1, la)._2)._1  // check index
+
+  def rotate[A](n: Int, la: List[A]): List[A] =
+    split(n, la).zipped.flatMap[A, List[A]]((e1, e2) => e2 ::: e1)
+
+  def removeAt[A](i: Int, la: List[A]): (List[A], A) =
+    (split(i - 1, la).zipped.flatMap[A, List[A]]((e1, e2) => e1 ::: e2.tail), la(i))
+
+
 }

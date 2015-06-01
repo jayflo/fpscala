@@ -3,7 +3,8 @@ package binarytree {
   sealed abstract class Tree[+T]
 
   case class Node[+T](value: T, left: Tree[T], right: Tree[T]) extends Tree[T] {
-    override def toString = "T(" + value.toString + " " + left.toString + " " + right.toString + ")"
+    override def toString =
+      "T(" + value.toString + " " + left.toString + " " + right.toString + ")"
   }
 
   case object End extends Tree[Nothing] {
@@ -20,12 +21,12 @@ package binarytree {
 
     def isMirrorOf[_](t1: Tree[_], t2: Tree[_]): Boolean = (t1, t2) match {
       case (End, End) => true
-      case ((Node[_], End) | (End, Node[_])) => false
+      case ((Node(_,_,_), End) | (End, Node(_,_,_))) => false
       case t @ (Node(_, ll, lr), Node(_, rl, rr)) => (ll, lr, rl, rr) match {
         case (End, End, End, End) => true
-        case (Node[_], End, End, Node[_]) => isMirrorOf(ll, rr)
-        case (End, Node[_], Node[_], End) => isMirrorOf(lr, rl)
-        case (Node[_], Node[_], Node[_], Node[_])
+        case (Node(_,_,_), End, End, Node(_,_,_)) => isMirrorOf(ll, rr)
+        case (End, Node(_,_,_), Node(_,_,_), End) => isMirrorOf(lr, rl)
+        case (Node(_,_,_), Node(_,_,_), Node(_,_,_), Node(_,_,_))
               => isMirrorOf(ll, rr) && isMirrorOf(lr, rl)
         case _ => false
       }
@@ -38,8 +39,10 @@ package binarytree {
     }
     */
 
+    /*
     def addValue[T, U >: T <% Ordered[U]](x: U): Tree[U] = this match {
       case _: End => Node(x)
     }
+    */
   }
 }
